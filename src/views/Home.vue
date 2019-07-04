@@ -22,4 +22,3 @@ export default {
     height: $h500;
   }
 </style>
-

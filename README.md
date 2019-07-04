@@ -96,6 +96,124 @@ module.exports = {
 
 1. vue.config.js中具体的配置项以及如何使用，直接看该文件的注释
 
+```
+
+module.exports = {
+    // css配置
+    css: {
+        loaderOptions: {
+            // pass options to sass-loader
+            sass: {
+                // @/ is an alias to src/
+                // so this assumes you have a file named `src/variables.scss`
+                // 全局引入公共的变量scss文件
+                data: `@import "~@/assets/scss/common.scss";`
+            }
+        }
+    },
+    //
+    configureWebpack:{
+      
+    },
+    // outputDir:'build', // 打包输出目录配置
+    /**
+     * 1 前后端不分离部署时，前端打包静态文件，后台tomat部署javaweb项目，后台部署名比如:CCTCP, 那么静态目录就为/CCTCP/static
+     * 2 刚好/CCTCP/static 就是前端资源的根目录
+     * 
+     */
+    publicPath: '/CCTCP/static', // 
+}
+
+
+```
+
+
+
+### webpack.config.prod.js
+> 由于cli3 抽象了webpack的配置信息，@vue/cli-service 提供了命令可以把内置的webpack配置导出
+
+1. npx vue-cli-service  --mode=product > xxx.js  // 生产模式配置，导出为xxx.js
+2. **其实真实的webpack.config.js文件在 node_modules/@vue/cli-service/ 目录下**
+
+
+
+
+
+### modes and env 模式和环境变量 （可以解决不同环境下 域名api接口url不同的问题）
+
+**环境变量文件修改需要项目重启**
+
+> mode 模式在vue cli中是很重要的概念，默认 有三种模式: development   test   production
+
+1. 根据 命令  vue-cli-service serve(build) , 环境变量 NODE_ENV 就会相应的设置为 development (production)
+2. NODE_ENV 决定了你的应用 运行的环境是 开发还是生产，继而在打包应用的时候就会生成该环境下的webpack配置
+
+
+> 可以在项目的根目录 新建一些环境变量的文件, 每个环境变量文件 就是key=value的键值对，有点类似java中的properties文件
+
+* .env                # loaded in all cases
+* .env.local          # loaded in all cases, ignored by git
+* .env.[mode]         # only loaded in specified mode
+* .env.[mode].local   # only loaded in specified mode, ignored by git
+
+> .local的文件都是本地的，git是忽略的，为了保密考虑
+
+
+> 环境变量文件的加载优先级
+
+* vue-cli-service build builds a production app, loading .env, .env.production and .env.production.local if they are present;
+* vue-cli-service build --mode staging builds a production app in staging mode, using .env, .env.staging and .env.staging.local if they are present
+
+
+> 环境变量文件中只有定义为VUE_APP_XXX的key-value才会被打包文件获取到，js业务代码中可以直接使用这些相当于是全局变量，打包后都会替换为value值
+
+```
+// .env
+VUE_APP_GBTYPE_DRY=0100
+VUE_APP_GBTYPE_WET=0200
+VUE_APP_GBTYPE_RECY=0300
+VUE_APP_GBTYPE_POIS=0400
+
+//上面配置的环境变量都会加入到process.env; 前面两个是系统内置
+
+BASE_URL: "/CCTCP/static/"  
+NODE_ENV: "development"
+VUE_APP_GBTYPE_DRY: "0100"
+VUE_APP_GBTYPE_POIS: "0400"
+VUE_APP_GBTYPE_RECY: "0300"
+VUE_APP_GBTYPE_WET: "0200"
+
+
+```
+
+> 应用场景：在项目开发的时候，打包测试的时候，可能api域名都不一样，那么就可以配置多个环境变量文件，将其配置进去
+
+1. vue-cli-service build --mode selftest //这种模式打包 会加载 .env, .env.selftest and .env.selftest.local
+2. **基于上面的特点，就可以实现不同测试环境的打包自动加载不同的环境变量文件，解决ap调用时域名的问题**
+3. 在项目中的应用代码中使用环境变量都必须是process.env.XXX来使用
+
+4. 注意在其他非生产模式环境下打包，其实调用的是dev模式的webpack配置，没有代码分割，打包生成的app.js巨大，解决方法就是在其他环境变量文件中添加
+   NODE_ENV=production // 那么就会调用webpack的生产模式打包配置，体积很小，且代码分离了  
+
+
+5. 可以在package.json中配置npm脚本名称，不必每次都手动输入 npx vue-cli-service build --mode xxx
+```
+
+  "scripts": {
+    "dev": "vue-cli-service serve",
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "build:self": "vue-cli-service build --mode self",
+    "build:baoxin": "vue-cli-service build --mode baoxin",
+    "lint": "vue-cli-service lint"
+  },
+
+  npm run build:self  //执行打包， 自测环境
+  npm run build:baoxin   //...  宝信测试环境
+
+```
+
+
 
 
 

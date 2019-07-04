@@ -10,17 +10,20 @@
 <script>
 // import base from '@/assets/scss/base.module.scss'
 export default {
-  data() {
+  data () {
     return {
       baseStyle: {}
-    };
+    }
   },
 
-  mounted() {
+  mounted () {
     // this.baseStyle = base;
     // console.log(base);
+
+    // 可直接使用一些环境变量
+    console.log(process.env)
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
