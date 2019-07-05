@@ -13,11 +13,11 @@
 ### assets静态资源
 > scss 是sass3 版本的新语法，完全兼容css3，可以看做sass的升级版本
 
-### 图片路径
+### 图片路径以及css中@import 引入
 > 编译过后的css文件都会经过 css-loader处理，处理url()资源路径引入问题
 1. 使用相对路径，相对于当前文件
 2. 使用 ~ 开头 引入node_modules中第三方包的资源，或者使用webpack定义alias别名@(@符号指向/src)，都要在前面带上~符号
-
+3. scss, less中使用 @import 导入其它文件时，路径使用 @符号时也要带上 ~ 符号： ~@/assets/scss/xxx.scss
 
 
 ### css模块化
