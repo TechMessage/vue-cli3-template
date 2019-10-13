@@ -50,5 +50,33 @@ module.exports = {
     // config.plugin('html').tap(args => {
 
     // })
-  }
+  },
+
+  devServer: {
+    // host: '0.0.0.0', 
+    port: '8888',
+    proxy: {
+        //匹配 /wx开头的api 使用代理target机器去访问
+        "/wx": {
+            // target: "http://wangli.nat300.top",
+            target: "http://130.252.133.111:8080",
+            changeOrigin: true,
+            ws: true,
+            // pathRewrite: {
+            //     '^/wx': '/wx'
+            // }
+        },
+
+        //匹配 /app开头的api 使用代理target机器去访问
+        // "/app": {
+        //     // target: "http://wangli.nat300.top",
+        //     target: "http://130.252.101.64:8080",
+        //     changeOrigin: true,
+        //     ws: true,
+        //     // pathRewrite: {
+        //     //     '^/wx': '/wx'
+        //     // }
+        // }
+    }
+},
 }
